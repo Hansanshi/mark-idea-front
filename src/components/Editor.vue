@@ -1,6 +1,6 @@
 <template>
 <div>
-          <div class="title"><span class="noselect">✏️ </span>{{title}}</div>
+          <div class="title"><span class="noselect">📝 </span>{{title}}</div>
 
           <div id="vditor" class="vditor"/>
 </div>
@@ -8,7 +8,7 @@
 
 <script>
 import Vditor from 'vditor'
-import "@/assets/index.css";
+import "@/assets/vditor.css";
 
 export default {
   name: 'Editor',
@@ -142,7 +142,7 @@ export default {
   methods: {
     init(){
       const options = {
-        // lang: "en_US",
+        // la;ng: "en_US",
           mode: 'ir',
           toolbar: this.toolbar,
           value:"",
@@ -150,7 +150,12 @@ export default {
           preview: {
             hljs:{
                 style: "native"
-            }
+            },
+            maxWidth : 4000
+
+          },
+          toolbarConfig: {
+            pin: true
           }
           
       }
@@ -162,6 +167,7 @@ export default {
       this.title = title;
     },
     getContent(){
+      this.vditor.setValue(this.vditor.getValue());
       return this.vditor.getValue();
     },
     saveContent(content){

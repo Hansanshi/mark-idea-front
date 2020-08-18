@@ -7,14 +7,14 @@
         <el-form  :model="formData"  @keyup.enter.native = "handleLogin">
         
         <el-form-item  prop="username" :rules="formRules.username">
-        <el-input maxlength="10" class="box-input"  v-model="formData.username"  placeholder="username" />  
+        <el-input maxlength="10" class="box-input"  v-model="formData.username"  placeholder="用户名" />  
         </el-form-item>
         <el-form-item prop="password" :rules="formRules.password">
-        <el-input class="box-input" type="password" v-model="formData.password"  placeholder="password" /> 
+        <el-input class="box-input" type="password" v-model="formData.password"  placeholder="密码" /> 
         </el-form-item>
         <div class="box-btn">
-          <el-button @click="handleLogin" type="primary">login</el-button>
-            <el-button @click="handleRegister">register</el-button>
+          <el-button @click="handleLogin" type="primary">登录</el-button>
+            <el-button @click="handleRegister">注册</el-button>
         </div>
         </el-form>
 </el-card>
@@ -34,11 +34,11 @@ export default {
             },
             formRules:{
                 username: [
-                    {required:true, message:"Username can't be null" },
+                    {required:true, message:"不能为空" },
                     {pattern:/^[A-Za-z0-9]+$/,message:'Invalid username'}
                 ],
                 password: [
-                    {required:true, message:"Password can't be null" },
+                    {required:true, message:"不能为空" },
                     {pattern:/^[A-Za-z0-9!@#$^]+$/,message:'Invalid password'}
                 ]
             }
@@ -55,17 +55,17 @@ export default {
                 res => {
                     res = res.data;
                     if(res.code === 0){
-                         this.$message({
+                         this.$notify({
                             type: 'success',
-                            message: 'Login successfully',
+                            message: '登录成功',
                             duration: 1000
                             });
                         setTimeout(()=>{this.$router.push('/');},700);
                         this.$store.commit('setLocalInfo', res.data);
                     }else{
-                        this.$message({
+                        this.$notify({
                             type: 'warning',
-                            message: 'Invalid username or password',
+                            message: '用户名或密码错误',
                             duration: 2000
                             });
                     }
@@ -83,14 +83,15 @@ export default {
                 res => {
                     res = res.data;
                     if(res.code === 0){
-                         this.$message({
+                         this.$notify({
                             type: 'success',
-                            message: 'Register successfully'
+                            message: '注册成功'
                             });
                     }else{
-                        this.$message({
+                        this.$notify({
                             type: 'warning',
-                            message: res.msg
+                            message: res.msg,
+                            duration: 700
                             });
                     }
                 }
