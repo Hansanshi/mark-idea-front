@@ -1,9 +1,13 @@
 <template>
   <div  style="margin-top: 40px; ">
     <el-card class="box-card"  >
+        <div align="center" >
+            <div style="font-size: 40px" class="markideaname">
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong >MarkIdea</strong>&nbsp;&nbsp;&nbsp;&nbsp;</div></div>
         <div align="center" class="box-img">
-              <img src="../../public/logo.png" style="width: 260px" >
+              📕
         </div>
+        
         <el-form  :model="formData"  @keyup.enter.native = "handleLogin">
         
         <el-form-item  prop="username" :rules="formRules.username">
@@ -119,5 +123,13 @@ export default {
     margin: 0 auto;
     /* max-height: 400px; */
     width: 260px;
+    font-size: 150px;
+}
+.markideaname{
+    width: 200px;
+    border-bottom-style: solid;
+    border-width: 1px;
+    border-color: lightgray;
+    margin: 10px;
 }
 </style>

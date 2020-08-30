@@ -115,7 +115,7 @@
 <el-aside width="180px" v-if="showHistory">
   <div style="padding-left: 10px;padding-top: 15px;">
   <div style="font-size:18px;padding-bottom: 5px; border"><span style="font-size:20px">🎛️ </span><strong>历史版本</strong></div>
-               <div v-for="version of curNote.noteVersion" :key="version.ref" >
+               <div v-for="version of curNoteVersion" :key="version.ref" >
                 <span style="font-size:13px;margin-right:3px">{{version.date}}</span>
                     <el-button size="mini" type="text" style="font-size:13px"
                     @click="handleRecover(version.ref)"
@@ -215,9 +215,8 @@ export default {
       },
       curNote: {
         noteTitle: null,
-        content: "",
-        noteVersion: []
-      },
+        content: ""      },
+      curNoteVersion: [],
       showAside: true,
       notebookList: [],
       noteList: [
@@ -234,9 +233,7 @@ export default {
     }
   },
   methods: {
-    test(){
-      console.log("dsds")
-    },
+    
     refreshNotebookList(notebookName){
     axios.get(global.HOST_URL+"/note", this.config).then(res => {
       res = res.data;
@@ -356,6 +353,7 @@ export default {
           this.showHistory = false;
           this.curNote.noteTitle = noteTitle;
           this.curNote.content = res.data;
+    this.curNoteVersion = [];
 
       this.$refs.editor.setContent(noteTitle, res.data, notebookName);
         }
@@ -428,12 +426,14 @@ export default {
     })
   },
   handleShowHistory(){
+    console.log("handleShowHistory")
     this.showHistory = !this.showHistory;
     let url = global.HOST_URL+ "/note/" + this.curNotebook.notebookName  + "/" + this.curNote.noteTitle + "/history";
     axios.get(url, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
-        this.curNote.noteVersion = res.data;
+        console.log(res.data)
+        this.curNoteVersion = res.data;
       }
     })
   },
@@ -466,6 +466,8 @@ export default {
         if(res.code === 0){
           this.newNoteBookVisible = false;
           this.refreshNotebookList(this.newNotebookName);
+          this.newNotebookName = null;
+
         }
     })
   },

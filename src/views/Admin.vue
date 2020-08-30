@@ -141,7 +141,7 @@ export default {
               if(res.code === 0){
               this.$message({
               type: 'success',
-              message: 'Start push to remote successfully',
+              message: '开始备份至远程仓库',
               duration: 1000
             });
               }
@@ -155,7 +155,7 @@ export default {
               if(res.code === 0){
               this.$message({
               type: 'success',
-              message: 'Stop push to remote successfully',
+              message: '停止备份',
               duration: 1000
             });
               }
@@ -170,9 +170,9 @@ export default {
         axios.put(url, param, this.config).then(res => {
           res = res.data;
           if(res.code === 0){
-            this.$message({
+            this.$notify({
                     type: 'success',
-                    message: 'Set remote repo url successfully'
+                    message: '设置远程仓库成功'
                   });
           }
         })
@@ -199,14 +199,14 @@ export default {
             res => {
               res = res.data;
               if(res.code === 0){
-                  this.$message({
+                  this.$notify({
                     type: 'success',
-                    message: 'Change password successfully'
+                    message: '修改密码成功'
                   });
                   this.newPassword = null,
                   this.oldPassword = null
               }else{
-                this.$message({
+                this.$notify({
                     type: 'warning',
                     message: res.msg
                   });
