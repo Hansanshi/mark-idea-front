@@ -1,25 +1,56 @@
 <template>
 <div>
-          <div class="title"><span class="noselect">📝 </span>{{title}}</div>
-
-          <div id="vditor" class="vditor"/>
+          
+     <div class="title">
+            <span v-if="!showEditTitle" class="noselect">
+✏️ </span>
+            <span v-if="!showEditTitle">{{title}}</span>
+            <el-input v-model="title" v-if="showEditTitle" @keyup.enter.native="renameTitle"/>
+            </div>
+ <!-- <el-container>
+   
+   <el-main style="padding: 40px"> -->
+          <div  id="vditor"  class="vditor"/>
+   <!-- </el-main>
+ </el-container> -->
 </div>
 </template>
 
 <script>
 import Vditor from 'vditor'
 import "@/assets/vditor.css";
+import global from '@/global'
+
 
 export default {
   name: 'Editor',
   data(){
     return {
+      showEditTitle:false,
+      config : {
+        headers: {
+          token : this.$store.getters.getToken,
+          username : this.$store.getters.getUsername
+        }
+      },
+      historyVersion:[
+                    {
+              hotkey: '⌘-s',  
+              name: "save",
+              tip: "保存",
+              icon: '<i class="fa fa-save fa-lg"/>',
+              click: () => {
+                this.saveContent(this.vditor.getValue());
+              }
+            }
+                ],
+      notebookName:null,
         title:"",
         vditor: null,
         toolbar: [
             {
                 hotkey: "⌘-H",
-                icon: "<i class='fa fa-header fa-lg'></i>",
+                icon: "<i  class='fa fa-header fa-lg'></i>",
                 name: "headings",
                 tipPosition: "ne",
             },
@@ -40,7 +71,7 @@ export default {
               tipPosition: "ne",
               },
             {
-              hotkey: "⌘-S",
+              hotkey: "⌘-L",
               icon: "<i class='fa fa-strikethrough fa-lg'></i>",
               name: "strike",
               prefix: "~~",
@@ -87,6 +118,12 @@ export default {
         name: "indent",
         tipPosition: "n",
     },
+    {
+        hotkey: "⌘-⇧-O",
+        icon: "<i class='fa fa-indent fa-lg'></i>",
+        name: "test",
+        tipPosition: "n",
+    },
             "|",
             {
         hotkey: "⌘-;",
@@ -115,6 +152,14 @@ export default {
             "fullscreen",
             "edit-mode",
             {
+              name:"history",
+              tip: "历史版本",
+              icon: "<i class='fa fa-history fa-lg'></i>",
+              click: () => {
+                this.showHistory();
+              }
+            },
+            {
                 name: "more",
                 toolbar: [
                     "content-theme",
@@ -137,7 +182,7 @@ export default {
   },
   mounted(){
     this.init();
-    this.vditor.clearCache()
+    this.vditor.clearCache();
   },
   methods: {
     init(){
@@ -154,25 +199,57 @@ export default {
             maxWidth : 4000
 
           },
-          toolbarConfig: {
-            pin: true
+          upload : {
+            url : global.HOST_URL + "/file/vditor",
+            headers: this.config.headers
           }
           
       }
       this.vditor = new Vditor('vditor', options)
 
     },
-    setContent(title, value){
+    setContent(title, value, notebookName){
+      this.notebookName = notebookName
+      this.showEditTitle = false;
       this.vditor.setValue(value);
       this.title = title;
+      global.historyVersion.push({
+              name:title,
+              tip: "历史版本",
+              icon: "<i class='fa fa-history fa-lg'></i>",
+              click: () => {
+
+              }});
+              
+    },
+    setTitleEditable(editable){
+      this.showEditTitle = editable;
     },
     getContent(){
       this.vditor.setValue(this.vditor.getValue());
       return this.vditor.getValue();
     },
-    saveContent(content){
-        this.$emit('saveContent', content);
-    }
+    getTitle(){
+      return this.title;
+    },
+    saveContent(){
+        this.vditor.setValue(this.vditor.getValue());
+
+        this.$emit('saveContent', this.vditor.getValue());
+    },
+    showHistory(){
+      this.$emit('showHistory');
+    },
+    renameTitle(){
+      this.$emit('renameTitle', this.title);
+    },
+    handleClose(done) {
+        this.$confirm('确认关闭？')
+          .then(() => {
+            done();
+          })
+          .catch(() => {});
+      }
   }
 }
 </script>
