@@ -206,6 +206,22 @@ export default {
       return this.title;
     },
     saveContent(){
+      if(!this.title){
+        this.$notify({
+          type:"warning",
+          message: "标题为空",
+          duration: 1000
+        })
+        return ;
+      }
+      if(!this.notebookName){
+        this.$notify({
+          type:"warning",
+          message: "请选择笔记本",
+          duration: 1000
+        })
+        return ;
+      }
         this.vditor.setValue(this.vditor.getValue());
 
         this.$emit('saveContent', this.vditor.getValue());

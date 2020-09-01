@@ -1,7 +1,7 @@
 <template>
   <div >
     <el-container>
-      <el-header class="header noselect" > <div>
+      <el-header class="header noselect" style="background-color: #FAFAFA; "> <div >
  <span @click="showAside = !showAside" >
 <strong>
 📕 MarkIdea</strong></span>
@@ -686,6 +686,8 @@ export default {
 },
   isModifUnsaved(){
     console.log("compare modify")
+    console.log(this.curNote)
+    console.log(this.curNotebook)
     console.log(this.$refs.editor.getContent().charCodeAt()  )
     console.log(this.curNote.content)
     if(this.$refs.editor.getContent().charCodeAt() === 10 && this.curNote.content === ""){
