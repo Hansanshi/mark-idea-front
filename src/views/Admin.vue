@@ -8,7 +8,7 @@
 </router-link>
   </div>
   <el-tabs  type="card" tab-position="top" >
-    <el-tab-pane  label="修改密码">
+    <el-tab-pane  label="🔑 修改密码">
     <el-form  label-width="110px" @keyup.enter.native = "handleChangePassword">
       <el-form-item class="noselect" label="旧密码">
         <el-input v-model = "oldPassword" type="password" style="max-width: 500px; margin-right: 20px" 
@@ -26,7 +26,7 @@
     </el-tab-pane>
 
 <!--   Remote repository section START--->
-    <el-tab-pane label="远程Git仓库">
+    <el-tab-pane label="🔄 远程Git仓库">
         <!-- <el-alert
         style="margin-bottom: 20px"
     title="Steps"
