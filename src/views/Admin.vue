@@ -139,7 +139,7 @@ export default {
             axios.post(url, null, this.config).then(res => {
               res = res.data;
               if(res.code === 0){
-              this.$message({
+              this.$notify({
               type: 'success',
               message: '开始备份至远程仓库',
               duration: 1000
@@ -153,7 +153,7 @@ export default {
             axios.delete(url, this.config).then(res => {
               res = res.data;
               if(res.code === 0){
-              this.$message({
+              this.$notify({
               type: 'success',
               message: '停止备份',
               duration: 1000
