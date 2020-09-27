@@ -72,6 +72,8 @@
     </el-form>
     </el-tab-pane>
 
+    <el-tab-pane label="🗂️ 文件管理"><file-manage></file-manage></el-tab-pane>
+
    
 
     <!--   Remote repository section END--->
@@ -113,10 +115,14 @@
 <script>
 import axios from 'axios'
 import global from '../global'
+import FileManage from '@/components/FileManage'
 
 
 export default {
     name: "admin",
+    components: {
+      FileManage
+    },
     data() {
       return {
         gitActive: 0,
