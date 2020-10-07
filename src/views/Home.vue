@@ -19,11 +19,11 @@
            <router-link style="color: black ; text-decoration: none" to="/admin">
 
     <el-dropdown-item >
-            设置
+            ⚙️ 设置
       </el-dropdown-item>
               </router-link>
 
-    <el-dropdown-item divided @click.native="handleLogout()">注销</el-dropdown-item>
+    <el-dropdown-item divided @click.native="handleLogout()">👋 注销</el-dropdown-item>
   </el-dropdown-menu>  
   
   </el-dropdown>
