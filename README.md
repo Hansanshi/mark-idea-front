@@ -1,29 +1,6 @@
-# mark-idea-front
+# 📕 MarkIdea 前端仓库
 
-## Project setup
-```
-npm install
-```
+前端是基于Vue + Vditor + ElementUI + axios开发，参与开发需要你拥有前端技术栈基础。
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 🙏 鸣谢
+- [编辑器Vditor](https://github.com/Vanessa219/vditor)
