@@ -195,6 +195,13 @@ export default {
       
               
     },
+    clear(){
+      this.vditor.setValue("");
+            this.notebookName = null
+      this.showEditTitle = false;
+            this.title = null;
+
+    },
     setTitleEditable(editable){
       this.showEditTitle = editable;
     },
@@ -224,7 +231,7 @@ export default {
       }
         this.vditor.setValue(this.vditor.getValue());
 
-        this.$emit('saveContent', this.vditor.getValue());
+        this.$emit('saveContent', this.vditor.getValue(), this.title, this.notebookName);
     },
     showHistory(){
       this.$emit('showHistory');

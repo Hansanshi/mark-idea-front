@@ -1,7 +1,7 @@
 <template>
   <div >
     <el-container>
-      <el-header class="header noselect" style="background-color: #FAFAFA; "> <div >
+      <el-header class="header noselect" style="background-color: #FAFAFA; " @contextmenu.prevent.native> <div >
  <span @click="showAside = !showAside" >
 <strong>
 📕 MarkIdea</strong></span>
@@ -33,9 +33,11 @@
 </el-header>
       <el-container  >
         <!-- 笔记本列表  -->
-        <el-aside width="200px" class="notebooklist noselect" v-if="showAside">
- 
-        <div class="notebook" style="  padding-bottom: 10px;color:grey">
+        <el-aside width="200px" class="notebooklist noselect" v-if="showAside ">
+          <div style="margin:5px">
+          <el-input clearable v-model="keyWord" @keyup.enter.native="searchNotes" placeholder="搜索笔记"></el-input>
+          </div>
+        <div @contextmenu.prevent class="notebook" style="  padding-bottom: 10px;color:grey">
         <span  style="font-size: 15px">
 <strong>笔记本</strong></span>
 
@@ -58,15 +60,15 @@
 📙
         <span>{{item.notebookName}}</span>
         </div> 
-        <el-collapse accordion>
+        <el-collapse @contextmenu.prevent.native accordion>
             <el-collapse-item >
-              <template slot="title">
+              <template  slot="title">
         <div v-contextmenu:delNotesRightMenu  class="notebook" 
         style=" font-size: 15px; padding-bottom: 10px;color:grey;border-bottom:0px">垃圾桶</div>
               </template>
               <div v-contextmenu:delNoteRightMenu class="delnote" v-for="item of delNoteList" :key="item.id">
                 
-                  {{item.title}}
+                  {{item.notebook}}/{{item.title}}
                 </div>
                 </el-collapse-item>
                 
@@ -75,8 +77,8 @@
 
 
         <!-- 笔记列表  -->
-       <el-aside class="noselect noteList" width="300px" v-if="showAside">
-         <div class="notebookInfo">
+       <el-aside @contextmenu.prevent.native class="noselect noteList" width="300px" v-if="showAside && showNotes">
+         <div  class="notebookInfo">
            <div>
            <span class="noselect">
 📙 </span>{{curNotebook.notebookName}}
@@ -97,11 +99,31 @@
                 v-contextmenu:noteRightMenu
 
         v-for="item of curNotebook.noteList" 
-        @click="selectNote(item.title)"
+        @click="selectNote(item.title, curNotebook.notebookName)"
         :key="item.title">
         <!-- <i class="fa fa-file-text" style="margin-right: 5px"/> -->
         <div class="notetitle">
           <span class="noselect">📝 </span>{{item.title}}</div>  
+        <div>{{item.previewContent}}</div>  </div>
+        
+      </el-aside>
+
+              <!-- 搜索结果列表  -->
+       <el-aside class="noselect noteList" width="300px" v-if="showAside && showSearch">
+         <div class="notebookInfo">
+           <div>
+           <span class="noselect">
+🔎 </span>{{searchNotesName}}
+           </div>
+             
+         </div>
+        <div class="note noselect" 
+        v-for="item of searchResult" 
+        @click="selectNote(item.title, item.notebookName)"
+        :key="item.title + 'search'" >
+        <!-- <i class="fa fa-file-text" style="margin-right: 5px"/> -->
+        <div class="notetitle">
+          <span class="noselect">📝 </span>{{item.notebookName}}/{{item.title}}</div>  
         <div>{{item.previewContent}}</div>  </div>
         
       </el-aside>
@@ -195,6 +217,14 @@ export default {
           username : this.$store.getters.getUsername
         }
       },
+// 搜索结果title
+searchNotesName:null,
+      // 是否展示搜索页面
+      showSearch:false,
+      // 搜索结果
+      searchResult:[],
+      // 搜索关键词
+      keyWord:null,
       // 是否展示重命名选项
       showRenameOption: false,
       // 被删除笔记列表
@@ -214,37 +244,33 @@ export default {
         noteList:[]
       },
       curNote: {
+        notebookName:null,
         noteTitle: null,
         content: ""      },
       curNoteVersion: [],
       showAside: true,
+      // 是否展示笔记列表
+      showNotes: true,
       notebookList: [],
       noteList: [
-        {
-          title: '笔记标题1',
-          abstract: '假如说我哦拥有过去的一切的一切，那么未来也不过是过去的一切'
-        },
-         {
-          title: '笔记标题4',
-          abstract: '曾经有一份真挚的爱情摆在我的面前'
-        }
+
 
       ]
     }
   },
   methods: {
     
-    refreshNotebookList(notebookName){
+  refreshNotebookList(notebookName){
     axios.get(global.HOST_URL+"/note", this.config).then(res => {
       res = res.data;
       if(res.code === 0){
         this.notebookList = res.data;
         if(notebookName){
-                  this.doSwitchNotebook(notebookName);
-                  return ;
+          this.doSwitchNotebook(notebookName);
+          return ;
 
         }
-        this.doSwitchNotebook(this.curNotebook.notebookName)
+        this.updateCurNotebookInfo()
       }
     })
     axios.get(global.HOST_URL+"/delnote", this.config).then( res => {
@@ -255,6 +281,10 @@ export default {
     } )
   },
   selectNoteList(notebookName){
+    if(this.showSearch) {
+      this.showSearch = false;
+      this.showNotes = true;
+    }
     // 判断是否是同一个笔记本
     if(this.curNotebook.notebookName === notebookName){
       return ;
@@ -292,8 +322,18 @@ export default {
     for (const notebook of this.notebookList) {
           if(notebook.notebookName === notebookName){
             this.curNotebook = notebook;
+            // let url = global.HOST_URL + "/note/" + notebookName;
+            // axios.get(url, this.config).then(res => {
+            //   res = res.data;
+            //   if(res.code === 0) {
+            //     this.curNotebook = {
+            //       'notebookName': notebookName,
+            //       'noteList': res.data
+            //     }
+            //   }
+            // })
             if(notebook.noteList && notebook.noteList.length > 0){
-              this.selectNote(notebook.noteList[0].title);
+              this.doSwitchNote(notebook.noteList[0].title, notebookName);
             }else{
               this.clearCurNoteInfo();
             }
@@ -301,21 +341,32 @@ export default {
           }
         }
   },
+  updateCurNotebookInfo(){
+    for (const notebook of this.notebookList) {
+          if(notebook.notebookName === this.curNotebook.notebookName){
+            this.curNotebook = notebook;
+          }
+        }
+  },
   clearCurNoteInfo(){
     this.curNote = {
       content: ""
     };
-          this.$refs.editor.setContent(null, "", null);
+    this.$refs.editor.setContent(null, "", null);
 
   },
   clearCurNotebookInfo(){
     this.curNotebook = {};
   },
-  selectNote(noteTitle){
+  selectNote(noteTitle, notebookName){
+    console.log("selectNote: " + noteTitle + ";" + notebookName)
+    
     // 同一个笔记  不用动
-    if(noteTitle == this.curNote.title){
+    if(noteTitle === this.curNote.noteTitle && notebookName === this.curNote.notebookName){
       return ;
     }
+    console.log(noteTitle === this.curNote.noteTitle)
+    console.log(this.curNote)
 
     // 判断是否有未保存的内容
     if(this.isModifUnsaved()){
@@ -325,7 +376,7 @@ export default {
           cancelButtonText: '丢弃'
         }).then(() => {
 
-          this.saveContentAndSwitchNote(this.$refs.editor.getContent(), this.curNotebook.notebookName, noteTitle);
+          this.saveContentAndSwitchNote(this.$refs.editor.getContent(), notebookName, noteTitle);
         }).catch(
           action => {
             this.$notify({
@@ -336,26 +387,30 @@ export default {
                 duration: 1500
             });
             if( action === 'cancel'){
-      this.doSwitchNote(noteTitle, this.curNotebook.notebookName);
+      this.doSwitchNote(noteTitle, notebookName);
             }
           }
         )
     }else{
-      this.doSwitchNote(noteTitle, this.curNotebook.notebookName);
+      console.log("hfhuhur")
+      this.doSwitchNote(noteTitle, notebookName);
 
     }
   },
   doSwitchNote(noteTitle, notebookName){
+    console.log("doSwitchNote:" + noteTitle + ";" + notebookName);
+
     let url = global.HOST_URL+"/note/"+notebookName+"/"+noteTitle;
       axios.get(url, this.config).then(res => {
         res = res.data;
         if(res.code === 0){
+          console.log(res)
           this.showHistory = false;
           this.curNote.noteTitle = noteTitle;
           this.curNote.content = res.data;
-    this.curNoteVersion = [];
-
-      this.$refs.editor.setContent(noteTitle, res.data, notebookName);
+          this.curNoteVersion = [];
+          this.curNote.notebookName = notebookName;
+          this.$refs.editor.setContent(noteTitle, res.data, notebookName);
         }
       })
 
@@ -364,7 +419,7 @@ export default {
     let request = {
         content: content
     }
-    let url = global.HOST_URL + "/note/" + this.curNotebook.notebookName + "/"+ this.curNote.noteTitle;
+    let url = global.HOST_URL + "/note/" + this.curNote.notebookName + "/"+ this.curNote.noteTitle;
     axios.post(url, request, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
@@ -381,11 +436,13 @@ export default {
     let request = {
         content: content
     }
-    let url = global.HOST_URL + "/note/" + this.curNotebook.notebookName + "/"+ this.curNote.noteTitle;
+    let url = global.HOST_URL + "/note/" + this.curNote.notebookName + "/"+ this.curNote.noteTitle;
     axios.post(url, request, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
         this.doSwitchNote(targetNoteTitle, targetNotebookName);
+        this.refreshNotebookList();
+
       }else{
         console.log(res)
       }
@@ -405,12 +462,12 @@ export default {
       )
   },
   // 保存笔记
-  handleSaveContent(content){
+  handleSaveContent(content, noteTitle, notebookName){
     console.log("save note:  "+content);
     let request = {
         content: content
     }
-    let url = global.HOST_URL + "/note/" + this.curNotebook.notebookName + "/"+ this.curNote.noteTitle;
+    let url = global.HOST_URL + "/note/" + notebookName+ "/"+ noteTitle;
     console.log(url)
     axios.post(url, request, this.config).then(res => {
       res = res.data;
@@ -450,6 +507,7 @@ export default {
     // check curNotebook
     // checkNewNoteExists
     this.showHistory = false;
+    this.curNote.notebookName = this.curNotebook.notebookName;
     this.curNote.noteTitle = this.newNoteTitle;
     this.newNoteTitle = undefined;
     this.curNote.content = "";
@@ -481,6 +539,44 @@ export default {
       });
     setTimeout(()=>{this.$router.push('/login');},700);
   },
+  // 搜索笔记
+searchNotes(){
+  if(this.isModifUnsaved()) {
+    this.$notify({
+      type:"warning",
+      message:"笔记尚未保存"
+    })
+    return ;
+  }
+
+  console.log(this.keyWord)
+      let url = global.HOST_URL + "/note/search";
+      if(!this.keyWord) {
+        this.$notify({
+              type: 'warning',
+              message: '搜索关键词不可为空'        })
+              return ;
+
+      }
+      let request = {
+        keyWord: this.keyWord
+      }
+      axios.post(url, request, this.config).then(
+      res => {
+        res = res.data;
+        if(res.code === 0){
+                    this.clearCurNoteInfo();
+
+          this.searchNotesName = '"' + this.keyWord + '"的搜索结果' ;
+          this.showSearch = true;
+          this.showNotes = false;
+          this.searchResult = res.data;
+            console.log(res.data);
+        }
+      }
+    )
+
+},
  
   // 校验用户
     validateUser(){
@@ -502,7 +598,6 @@ export default {
     },
     // 设置右键选中时笔记信息
     handleNoteRightMenu(vnode){
-      console.log('ddddjojo')
       this.noteRightMenuValues.noteTitle = vnode.data.key;
       this.noteRightMenuValues.notebookName = this.curNotebook.notebookName;
             this.showRenameOption = this.isCurNote()
@@ -616,10 +711,10 @@ export default {
     handleMoveNote(newNotebookName){
       
       let targetNotebook = newNotebookName;
-      let url = global.HOST_URL + "/note/" + targetNotebook + "/" + this.curNote.noteTitle;
+      let url = global.HOST_URL + "/note/" + targetNotebook + "/" + this.noteRightMenuValues.noteTitle;
       let param = {
-        srcNotebook : this.curNotebook.notebookName,
-        srcTitle : this.curNote.noteTitle,
+        srcNotebook : this.noteRightMenuValues.notebookName,
+        srcTitle : this.noteRightMenuValues.noteTitle,
         move : true
       }
       axios.put(url, param, this.config).then(res => {
@@ -636,10 +731,10 @@ export default {
     },
     handleCopyNote(newNotebookName){
       let targetNotebook = newNotebookName;
-      let url = global.HOST_URL + "/note/" + targetNotebook + "/" + this.curNote.noteTitle;
+      let url = global.HOST_URL + "/note/" + targetNotebook + "/" + this.noteRightMenuValues.noteTitle;
       let param = {
-        srcNotebook : this.curNotebook.notebookName,
-        srcTitle : this.curNote.noteTitle,
+        srcNotebook : this.noteRightMenuValues.notebookName,
+        srcTitle : this.noteRightMenuValues.noteTitle,
       }
       axios.put(url, param, this.config).then(res => {
         res = res.data;
@@ -672,6 +767,7 @@ export default {
         this.$refs.editor.setContent(noteTitle, res.data, notebookName);
         // 展示新历史
         this.handleShowHistory();
+        this.refreshNotebookList();
       }
     })
   },
@@ -686,8 +782,6 @@ export default {
 },
   isModifUnsaved(){
     console.log("compare modify")
-    console.log(this.curNote)
-    console.log(this.curNotebook)
     console.log(this.$refs.editor.getContent().charCodeAt()  )
     console.log(this.curNote.content)
     if(this.$refs.editor.getContent().charCodeAt() === 10 && this.curNote.content === ""){
