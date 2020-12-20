@@ -232,7 +232,7 @@ export default {
           res = res.data;
           this.$notify({
             type:"success",
-            message:"公开成功，地址为: " + window.location.host + "/article/" + this.config.headers.username + "/" + res.articleId,
+            message:"公开成功，地址为: " + window.location.host + "/#/article/" + this.config.headers.username + "/" + res.articleId,
             duration: 10000
           })
         }

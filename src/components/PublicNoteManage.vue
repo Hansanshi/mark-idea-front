@@ -36,7 +36,7 @@
     >
           <template slot-scope="scope">
 
-    <a :href = '"/article/" + config.headers.username + "/" + scope.row.articleId ' style="padding-right: 10px" target="_blank">预览</a>
+    <a :href = '"/#/article/" + config.headers.username + "/" + scope.row.articleId ' style="padding-right: 10px" target="_blank">预览</a>
     <!-- <el-button type="text" size="medium" @click="handleDeleteFile(scope.row.fileName)">删除</el-button> -->
     </template>
     </el-table-column>
@@ -70,11 +70,7 @@ import axios from 'axios'
           username : this.$store.getters.getUsername
         }
       },
-        tableData: [{
-            articleId: "玉米.md",
-            notebookName: "134 GB",
-            noteTitle: "2020-09-24 56:78"
-        }
+        tableData: [
         ],
         selectedArticles: [],
         pageSize : 10,
