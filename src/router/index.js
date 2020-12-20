@@ -27,6 +27,12 @@ Vue.use(VueRouter)
     path: '/admin',
     name: 'admin',
     component: () => import('../views/Admin.vue')
+  },
+  {
+    path: '/article/:author/:id',
+    name: 'article',
+    props: true,
+    component: () => import('../views/Article.vue')
   }
 ]
 

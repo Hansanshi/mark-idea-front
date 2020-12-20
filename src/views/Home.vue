@@ -197,8 +197,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
 import Editor from '@/components/Editor.vue'
 import axios from 'axios'
 import global from '@/global'
@@ -686,8 +684,6 @@ searchNotes(){
     this.$refs.editor.setTitleEditable(true);
     },
     doHandleRenameTitle(newTitle){
-      console.log('new ' + newTitle);
-      console.log('origin ' + this.curNote.noteTitle)
       let targetNotebook = this.curNotebook.notebookName;
       let url = global.HOST_URL + "/note/" + targetNotebook + "/" + newTitle;
       let param = {

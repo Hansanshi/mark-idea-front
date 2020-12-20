@@ -94,7 +94,6 @@ import axios from 'axios'
       },
       
       handleSelectionChange(val) {
-          console.log(val)
         this.selectedFiles = val;
       },
       handleSizeChange(pageSize){          
@@ -110,7 +109,6 @@ import axios from 'axios'
           axios.get(url, this.config).then(res => {
               res = res.data;
             if(res.code == 0){
-                console.log(res.data)
                 this.tableData = res.data.fileDetailList;
                 this.pageIndex = res.data.pageIndex;
                 this.pageSize = res.data.pageSize;

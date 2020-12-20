@@ -58,7 +58,7 @@
 
              
       <el-form-item class="noselect" label="第三步">
-        输入Git远程仓库地址，例如 git@github.com:Hansanshi/mark-idea-front.git, 并点击提交
+        输入Git远程仓库地址，例如 git@github.com:Hansanshi/mark-idea-front.git, 并点击提交保存。（点击开始备份即可开始）
         <br/>
         <el-input v-model = "remoteRepoUrl" style="max-width: 500px; margin-right: 20px" 
           placeholder="e.g. git@github.com:Hansanshi/mark-idea-front.git"></el-input>
@@ -74,40 +74,8 @@
 
     <el-tab-pane label="🗂️ 文件管理"><file-manage></file-manage></el-tab-pane>
 
-   
-
-    <!--   Remote repository section END--->
-
-     <!-- <el-tab-pane label="test">
-                                       <div style="margin: 20px">依次完成如下三步，即可备份至远程仓库</div>
-
-       <el-steps :active="gitActive" finish-status="success"  style="margin: 20px">
-  <el-step title="步骤 1" >
-    <template slot="description" >
-      <span style="font-size: 16px;margin-right: 10px">点击右边按钮</span>
-
-<el-button style="margin-left: 3px" class="noselect" type="primary" @click="handleGenSshKey()">生成ssh密钥</el-button>
-                    <div v-if="genSshKey">
-                    <p style="font-size: 16px;margin-top: 5px; margin-bottom: 5px" >生成的ssh公钥</p>
-<el-input type="textarea"
-:readonly="true"
-  autosize
-  v-model = "sshkey" style="max-width: 500px; margin-right: 20px ; padding-top: 0; color: grey" 
-          ></el-input>
-                    </div>
-
-    </template>
-
-                    
-
-  </el-step>
-  <el-step title="步骤 2" ></el-step>
-  <el-step title="步骤 3" ></el-step>
-</el-steps>
-<div id = "stepbtns">
-
-</div>
-    </el-tab-pane> -->
+       <el-tab-pane label="📑 公开笔记管理"><public-note-manage></public-note-manage></el-tab-pane>
+       
 
   </el-tabs>
 </div>
@@ -116,12 +84,13 @@
 import axios from 'axios'
 import global from '../global'
 import FileManage from '@/components/FileManage'
-
+import PublicNoteManage from '@/components/PublicNoteManage'
 
 export default {
     name: "admin",
     components: {
-      FileManage
+      FileManage,
+      PublicNoteManage
     },
     data() {
       return {

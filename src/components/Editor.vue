@@ -18,8 +18,10 @@
 
 <script>
 import Vditor from 'vditor'
-import "@/assets/vditor.css";
+import "@/assets/vditor.css"
 import global from '@/global'
+import axios from 'axios'
+
 
 
 export default {
@@ -140,12 +142,12 @@ export default {
                 this.showHistory();
               }
             },
+            "outline",
             {
                 name: "more",
                 toolbar: [
                     "content-theme",
                     "export",
-                    "outline",
                     "preview",
                 ],
             },{
@@ -155,6 +157,13 @@ export default {
               icon: '<i class="fa fa-save fa-lg"/>',
               click: () => {
                 this.saveContent(this.vditor.getValue());
+              }
+            },{
+              name: "share",
+              tip: "公开",
+              icon: '<i class="fa fa-share-alt fa-lg"/>',
+              click: () => {
+                this.publishNote();
               }
             }
         ]
@@ -211,6 +220,23 @@ export default {
     },
     getTitle(){
       return this.title;
+    },
+    publishNote() {
+      let req = {
+        notebookName: this.notebookName,
+        noteTitle: this.title
+      }
+      axios.post(global.HOST_URL + "/article", req, this.config).then(res => {
+        res = res.data;
+        if(res.code === 0) {
+          res = res.data;
+          this.$notify({
+            type:"success",
+            message:"公开成功，地址为: " + window.location.host + "/article/" + this.config.headers.username + "/" + res.articleId,
+            duration: 10000
+          })
+        }
+      })
     },
     saveContent(){
       if(!this.title){
