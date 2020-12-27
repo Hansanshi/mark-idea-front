@@ -128,7 +128,7 @@
         
       </el-aside>
 
-      <el-main class="editor" >
+      <el-main class="editor"  style="overflow: unset">
         <Editor  ref="editor" 
         @showHistory="handleShowHistory"
         @saveContent="handleSaveContent" @renameTitle="doHandleRenameTitle" />

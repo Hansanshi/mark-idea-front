@@ -179,6 +179,9 @@ export default {
         // la;ng: "en_US",
           mode: 'ir',
           toolbar: this.toolbar,
+          toolbarConfig:{
+            pin:true
+          },
           value:"",
           preview: {
             hljs:{
