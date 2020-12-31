@@ -332,6 +332,7 @@ export default {
                 duration: 1500
             });
             if( action === 'cancel'){
+              this.handleDelTmpNote();
       this.doSwitchNotebook(notebookName);
             }
           }
@@ -401,6 +402,8 @@ export default {
                 duration: 1500
             });
             if( action === 'cancel'){
+                            this.handleDelTmpNote();
+
       this.doSwitchNote(noteTitle, notebookName);
             }
           }
@@ -729,6 +732,11 @@ this.showHistory = false;
         // }
       }
     })
+
+    },
+    handleDelTmpNote() {
+          let url = global.HOST_URL + "/note/" + this.curNote.notebookName + "/" + this.curNote.noteTitle + "?delDraft=true";
+          axios.delete(url, this.config)
 
     },
     handleRenameNote(){
