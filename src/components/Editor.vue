@@ -1,7 +1,7 @@
 <template>
 <div>
           
-     <div class="title">
+     <div v-show="notebookName && title && title.length > 0" class="title">
             <span v-if="!showEditTitle" class="noselect">
 ✏️ </span>
             <span v-if="!showEditTitle">{{title}}</span>
@@ -10,7 +10,7 @@
  <!-- <el-container>
    
    <el-main style="padding: 40px"> -->
-          <div  id="vditor"  class="vditor"/>
+          <div v-show="notebookName && title && title.length > 0" id="vditor"  class="vditor"/>
    <!-- </el-main>
  </el-container> -->
 </div>
@@ -203,9 +203,7 @@ export default {
       this.notebookName = notebookName
       this.showEditTitle = false;
       this.vditor.setValue(value);
-      this.title = title;
-      
-              
+      this.title = title;     
     },
     clear(){
       this.vditor.setValue("");
@@ -217,7 +215,13 @@ export default {
     setTitleEditable(editable){
       this.showEditTitle = editable;
     },
-    getContent(){
+    /**
+     * raw 是否直接获取值  不进行去空行
+     */
+    getContent(raw){
+      if(raw) {
+        return this.vditor.getValue();
+      }
       this.vditor.setValue(this.vditor.getValue());
       return this.vditor.getValue();
     },

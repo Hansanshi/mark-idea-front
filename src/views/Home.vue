@@ -56,9 +56,12 @@
          <div class="notebook" v-for="item of notebookList" 
             v-contextmenu:notebookRightMenu
             :key="item.notebookName" 
-            @click="selectNoteList(item.notebookName)">        
-📙
-        <span>{{item.notebookName}}</span>
+            >        
+                    <el-input v-if="toRenameNotebookName && toRenameNotebookName.length > 0 && toRenameNotebookName === item.notebookName" 
+                    v-model="destNotebookName" @keyup.enter.native="handleRenameNotebook" placeholder="新笔记本名" />
+
+         <div @click="selectNoteList(item.notebookName)" v-else>📙 {{item.notebookName}}</div>
+
         </div> 
         <el-collapse @contextmenu.prevent.native accordion>
             <el-collapse-item >
@@ -101,9 +104,24 @@
         v-for="item of curNotebook.noteList" 
         @click="selectNote(item.title, curNotebook.notebookName)"
         :key="item.title">
-        <!-- <i class="fa fa-file-text" style="margin-right: 5px"/> -->
         <div class="notetitle">
-          <span class="noselect">📝 </span>{{item.title}}</div>  
+          <span class="noselect">📝 </span>{{item.title}} 
+  
+                <span class="pull-right">
+                                <span class="vditor-tooltipped vditor-tooltipped__nw " aria-label="修改尚未保存">
+
+                <i v-if = "item.status === 2" aria-label="修改尚未保存" style = "color:lightgrey" 
+                class="fa fa-warning  "
+                ></i>
+                                </span>
+                <span class="vditor-tooltipped vditor-tooltipped__nw" aria-label="公开笔记">
+
+                <i v-if = "item.articleId" style = "color:lightgrey;padding-left:5px" class=" fa fa-eye "></i>
+                </span>
+                </span>
+                </div>  
+
+          
         <div>{{item.previewContent}}</div>  </div>
         
       </el-aside>
@@ -174,6 +192,7 @@
       <!-- 笔记本右键菜单 -->
       <v-contextmenu theme="dark" class="rightMenu" ref="notebookRightMenu" @contextmenu="handleNotebookRightMenu">
         <v-contextmenu-item @click="handleDelNotebook">删除</v-contextmenu-item>
+        <v-contextmenu-item @click="allowRenameNotebook">重命名</v-contextmenu-item>
 
       </v-contextmenu>
         <!-- 垃圾桶右键菜单  -->
@@ -215,8 +234,8 @@ export default {
           username : this.$store.getters.getUsername
         }
       },
-// 搜索结果title
-searchNotesName:null,
+      // 搜索结果title
+      searchNotesName: null,
       // 是否展示搜索页面
       showSearch:false,
       // 搜索结果
@@ -229,6 +248,12 @@ searchNotesName:null,
       delNoteList:[],
       // 用于存放右键菜单选中的笔记信息
       noteRightMenuValues:{},
+      // 待重命名笔记本
+      toRenameNotebookName: null,
+
+      // 重命名笔记本目标名
+      destNotebookName: null,
+
       // 新建笔记本弹窗
       newNoteBookVisible:false,
       // 新建笔记按钮弹窗
@@ -259,6 +284,7 @@ searchNotesName:null,
   methods: {
     
   refreshNotebookList(notebookName){
+    this.clearRenameInfo();
     axios.get(global.HOST_URL+"/note", this.config).then(res => {
       res = res.data;
       if(res.code === 0){
@@ -316,20 +342,10 @@ searchNotesName:null,
   },
   // 真的切换笔记本
   doSwitchNotebook(notebookName){
-
+    this.clearRenameInfo();
     for (const notebook of this.notebookList) {
           if(notebook.notebookName === notebookName){
             this.curNotebook = notebook;
-            // let url = global.HOST_URL + "/note/" + notebookName;
-            // axios.get(url, this.config).then(res => {
-            //   res = res.data;
-            //   if(res.code === 0) {
-            //     this.curNotebook = {
-            //       'notebookName': notebookName,
-            //       'noteList': res.data
-            //     }
-            //   }
-            // })
             if(notebook.noteList && notebook.noteList.length > 0){
               this.doSwitchNote(notebook.noteList[0].title, notebookName);
             }else{
@@ -461,7 +477,7 @@ searchNotesName:null,
   },
   // 保存笔记
   handleSaveContent(content, noteTitle, notebookName){
-    console.log("save note:  "+content);
+    this.showHistory = false;
     let request = {
         content: content
     }
@@ -481,7 +497,6 @@ searchNotesName:null,
     })
   },
   handleShowHistory(){
-    console.log("handleShowHistory")
     this.showHistory = !this.showHistory;
     let url = global.HOST_URL+ "/note/" + this.curNotebook.notebookName  + "/" + this.curNote.noteTitle + "/history";
     axios.get(url, this.config).then(res => {
@@ -516,7 +531,7 @@ searchNotesName:null,
   handleCreateNotebook(){
     let url = global.HOST_URL + "/note/" + this.newNotebookName;
     console.log(url);
-    axios.put(url, null, this.config).then(res => {
+    axios.put(url, {}, this.config).then(res => {
         res = res.data;
         console.log(res);
         if(res.code === 0){
@@ -526,6 +541,9 @@ searchNotesName:null,
 
         }
     })
+  },
+  clearRenameInfo(){
+    this.toRenameNotebookName = null;
   },
     // 删除本地存储信息  并切换至登录页面
   clearInfoAndPushToLogin(){
@@ -656,9 +674,43 @@ searchNotes(){
         }
       })
     },
+    allowRenameNotebook() {
+      this.toRenameNotebookName = this.notebookRightMenuValues.notebookName;
+      this.destNotebookName = this.toRenameNotebookName;
+    },
+    handleRenameNotebook() {
+      console.log("rename " + this.toRenameNotebookName + " to " + this.destNotebookName);
+      let url = global.HOST_URL+"/note/"+this.destNotebookName;
+      let request = {
+        move : true,
+        srcNotebook : this.toRenameNotebookName
+      }
+            this.clearRenameInfo();
+this.showHistory = false;
+      axios.put(url, request, this.config).then(res => {
+        res = res.data;
+        if(res.code === 0) {
+          res = res.data;
+          this.notebookList.forEach(notebook => {
+
+            if(notebook.notebookName === request.srcNotebook) {
+                notebook.notebookName = this.destNotebookName;
+                notebook.noteList = res;
+            }
+          });
+        } else {
+            this.$notify({
+              type: 'error',
+              message: res.msg,
+              duration: 1000
+            });
+        } 
+      })
+
+    },
+
+    
     isCurNote(){
-      console.log('right' );
-      console.log(this.noteRightMenuValues)
       if(this.noteRightMenuValues.notebookName !== this.curNotebook.notebookName){
         return false;
       }
@@ -769,27 +821,51 @@ searchNotes(){
   },
     doInit(){
         this.refreshNotebookList();
-        // this.checkUnsavedNote();
-        // // todo 将时间改为5min，与后台保持一致
-        // this.timer = setInterval(() => {
-        //   this.checkPushStatus();
-        //   this.autoSaveDraftNote();
-        // }, 1 * 60 * 1000);
+        setInterval(() => {
+          this.autoSaveNote();
+        }, 10 * 1000);
 },
-  isModifUnsaved(){
-    console.log("compare modify")
-    console.log(this.$refs.editor.getContent().charCodeAt()  )
-    console.log(this.curNote.content)
-    if(this.$refs.editor.getContent().charCodeAt() === 10 && this.curNote.content === ""){
+  isModifUnsaved(raw){
+
+    if(this.$refs.editor.getContent(raw).charCodeAt() === 10 && this.curNote.content === ""){
         return false;
     }
-    console.log(this.$refs.editor.getContent())
-    return this.curNote.content !== this.$refs.editor.getContent();
+    // console.log(this.$refs.editor.getContent(raw))
+
+    return this.curNote.content !== this.$refs.editor.getContent(raw);
+  },
+  autoSaveNote() {
+        console.log("start 临时保存")
+
+    if(!this.isModifUnsaved(true)) {
+      return ;
+    }
+    if(this.$refs.editor.getContent(true) === this.curNote.tmpContent) {
+      return ;
+    }
+    if(!this.curNote || !this.curNote.noteTitle || this.curNote.noteTitle.length === 0) {
+      return ;
+    }
+    let  content = this.$refs.editor.getContent(true);
+    let request = {
+        content: content,
+        tmpSave: true
+    }
+    let url = global.HOST_URL + "/note/" + this.curNote.notebookName + "/"+ this.curNote.noteTitle;
+    axios.post(url, request, this.config).then(res => {
+      res = res.data;
+      if(res.code === 0){
+        console.log("临时保存成功")
+        this.curNote.tmpContent = content;
+        // this.curNote.content = content;
+      }
+    })
+
   }
   },
   mounted(){
     this.validateUser();
-    this.refreshNotebookList();
+    // this.refreshNotebookList();
   }
 }
 </script>
