@@ -228,6 +228,9 @@ export default {
     getTitle(){
       return this.title;
     },
+    setNotebookName(notebookName) {
+        this.notebookName = notebookName
+    },
     publishNote() {
       let req = {
         notebookName: this.notebookName,

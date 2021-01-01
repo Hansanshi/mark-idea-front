@@ -53,14 +53,15 @@
         </el-popover>
                 </div>
 
-         <div class="notebook" v-for="item of notebookList" 
+         <div v-for="item of notebookList" 
             v-contextmenu:notebookRightMenu
             :key="item.notebookName" 
-            >        
-                    <el-input v-if="toRenameNotebookName && toRenameNotebookName.length > 0 && toRenameNotebookName === item.notebookName" 
+            >        <div v-if="toRenameNotebookName && toRenameNotebookName.length > 0 && toRenameNotebookName === item.notebookName"  class="notebook"  >
+                    <el-input 
                     v-model="destNotebookName" @keyup.enter.native="handleRenameNotebook" placeholder="新笔记本名" />
+                    </div>
 
-         <div @click="selectNoteList(item.notebookName)" v-else>📙 {{item.notebookName}}</div>
+         <div class="notebook" @click="selectNoteList(item.notebookName)" v-else>📙 {{item.notebookName}}</div>
 
         </div> 
         <el-collapse @contextmenu.prevent.native accordion>
@@ -682,7 +683,6 @@ searchNotes(){
       this.destNotebookName = this.toRenameNotebookName;
     },
     handleRenameNotebook() {
-      console.log("rename " + this.toRenameNotebookName + " to " + this.destNotebookName);
       let url = global.HOST_URL+"/note/"+this.destNotebookName;
       let request = {
         move : true,
@@ -694,6 +694,9 @@ this.showHistory = false;
         res = res.data;
         if(res.code === 0) {
           res = res.data;
+          if(request.srcNotebook === this.curNote.notebookName) {
+            this.$refs.editor.setNotebookName(this.destNotebookName);
+          }
           this.notebookList.forEach(notebook => {
 
             if(notebook.notebookName === request.srcNotebook) {
