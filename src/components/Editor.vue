@@ -7,12 +7,7 @@
             <span v-if="!showEditTitle">{{title}}</span>
             <el-input v-model="title" v-if="showEditTitle" @keyup.enter.native="renameTitle"/>
             </div>
- <!-- <el-container>
-   
-   <el-main style="padding: 40px"> -->
           <div v-show="notebookName && title && title.length > 0" id="vditor"  class="vditor"/>
-   <!-- </el-main>
- </el-container> -->
 </div>
 </template>
 
