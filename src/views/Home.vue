@@ -18,12 +18,13 @@
    <el-dropdown-menu slot="dropdown">
            <router-link style="color: black ; text-decoration: none" to="/admin">
 
-    <el-dropdown-item >
-            ⚙️ 设置
+    <el-dropdown-item class="markidea-dropdown-item">
+            设置
       </el-dropdown-item>
               </router-link>
+    <el-dropdown-item class="markidea-dropdown-item" divided @click.native="showAboutPage = !showAboutPage">关于</el-dropdown-item>
 
-    <el-dropdown-item divided @click.native="handleLogout()">👋 注销</el-dropdown-item>
+    <el-dropdown-item class="markidea-dropdown-item" divided @click.native="handleLogout()">注销</el-dropdown-item>
   </el-dropdown-menu>  
   
   </el-dropdown>
@@ -33,7 +34,7 @@
 </el-header>
       <el-container  >
         <!-- 笔记本列表  -->
-        <el-aside width="200px" class="notebooklist noselect" v-if="showAside ">
+        <el-aside width="200px" class="notebooklist noselect" v-show="showAside ">
           <div style="margin:5px">
           <el-input clearable v-model="keyWord" @keyup.enter.native="searchNotes" placeholder="搜索笔记"></el-input>
           </div>
@@ -81,7 +82,7 @@
 
 
         <!-- 笔记列表  -->
-       <el-aside @contextmenu.prevent.native class="noselect noteList" width="300px" v-if="showAside && showNotes">
+       <el-aside @contextmenu.prevent.native class="noselect noteList" width="300px" v-show="showAside && showNotes">
          <div  class="notebookInfo">
            <div>
            <span class="noselect">
@@ -209,6 +210,19 @@
 
       </v-contextmenu>
 
+
+      <el-dialog
+      :modal='false'
+      :show-close='false'
+      :center='true'
+  :visible.sync="showAboutPage"
+  width="25%"
+  >
+  
+  <strong slot="title" style="font-size:30px">📕 MarkIdea</strong>
+  <about></about>
+</el-dialog>
+
   </div>
 
 
@@ -220,12 +234,15 @@
 import Editor from '@/components/Editor.vue'
 import axios from 'axios'
 import global from '@/global'
+import About from '@/components/About.vue'
+
 
 export default {
   name: 'Home',
   components: {
     // HelloWorld,
-    Editor
+    Editor,
+    About
   },
   data(){
     return {
@@ -241,6 +258,8 @@ export default {
       showSearch:false,
       // 搜索结果
       searchResult:[],
+      // 是否为移动端
+      isMobile: false,
       // 搜索关键词
       keyWord:null,
       // 是否展示重命名选项
@@ -261,6 +280,8 @@ export default {
       newNoteVisible:false,
       // 新笔记名
       newNotebookName: "",
+      // 是否展示关于
+      showAboutPage:false,
       showHistory: false,
       newNoteTitle: "",
       curNotebook: {
@@ -349,7 +370,7 @@ export default {
           if(notebook.notebookName === notebookName){
             this.curNotebook = notebook;
             if(notebook.noteList && notebook.noteList.length > 0){
-              this.doSwitchNote(notebook.noteList[0].title, notebookName);
+              this.doSwitchNote(notebook.noteList[0].title, notebookName, true);
             }else{
               this.clearCurNoteInfo();
             }
@@ -376,13 +397,14 @@ export default {
   },
   selectNote(noteTitle, notebookName){
     console.log("selectNote: " + noteTitle + ";" + notebookName)
+    if(this.isMobile) {
+      this.showAside = false;
+    }
     
     // 同一个笔记  不用动
     if(noteTitle === this.curNote.noteTitle && notebookName === this.curNote.notebookName){
       return ;
     }
-    console.log(noteTitle === this.curNote.noteTitle)
-    console.log(this.curNote)
 
     // 判断是否有未保存的内容
     if(this.isModifUnsaved()){
@@ -410,13 +432,13 @@ export default {
           }
         )
     }else{
-      console.log("hfhuhur")
       this.doSwitchNote(noteTitle, notebookName);
 
     }
   },
-  doSwitchNote(noteTitle, notebookName){
+  doSwitchNote(noteTitle, notebookName, auto){
     console.log("doSwitchNote:" + noteTitle + ";" + notebookName);
+    console.log("auto: " + auto)
 
     let url = global.HOST_URL+"/note/"+notebookName+"/"+noteTitle;
       axios.get(url, this.config).then(res => {
@@ -429,6 +451,10 @@ export default {
           this.curNoteVersion = [];
           this.curNote.notebookName = notebookName;
           this.$refs.editor.setContent(noteTitle, res.data, notebookName);
+          // 如果是移动端
+    if(this.isMobile && !auto) {
+      this.showAside = false;
+    }
         }
       })
 
@@ -529,6 +555,12 @@ export default {
     this.newNoteTitle = undefined;
     this.curNote.content = "";
     this.$refs.editor.setContent(this.curNote.noteTitle, "", this.curNotebook.notebookName);
+
+    // 如果是移动端
+    if(this.isMobile) {
+      this.showAside = false;
+    }
+
     this.newNoteVisible = false;
   },
   // 新建笔记本
@@ -835,6 +867,16 @@ this.showHistory = false;
         setInterval(() => {
           this.autoSaveNote();
         }, 10 * 1000);
+        this.setIsMobile();
+        window.onresize = this.setIsMobile;
+},
+setIsMobile() {
+let w = window.innerWidth;
+          let that = this;
+          console.log("width: " + w)
+          if(w < 551) {
+              that.isMobile = true;
+          }
 },
   isModifUnsaved(raw){
 
@@ -985,5 +1027,9 @@ this.showHistory = false;
 }
 .lightGreyBackground{
   background-color: lightgray;
+}
+.markidea-dropdown-item{
+  min-width: 45px;
+  text-align: center;
 }
 </style>
