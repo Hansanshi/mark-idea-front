@@ -171,7 +171,16 @@ export default {
   methods: {
     init(){
       const options = {
-        // la;ng: "en_US",
+        counter:{
+          enable:true,
+          type: 'text'
+        },
+
+        after: () => {
+          // 设置大纲固定
+          document.querySelector('.vditor-outline__content').classList.add("vditor-toolbar--pin")
+          document.querySelector('.vditor-outline').classList.add("vditor-toolbar--pin")
+        },
           mode: 'ir',
           toolbar: this.toolbar,
           toolbarConfig:{
@@ -192,7 +201,6 @@ export default {
           
       }
       this.vditor = new Vditor('vditor', options)
-
     },
     setContent(title, value, notebookName){
       this.notebookName = notebookName

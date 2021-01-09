@@ -282,6 +282,8 @@ export default {
       newNotebookName: "",
       // 是否展示关于
       showAboutPage:false,
+      // 定时器Id 用于清除
+      timerId: null,
       showHistory: false,
       newNoteTitle: "",
       curNotebook: {
@@ -631,7 +633,7 @@ searchNotes(){
 },
  
   // 校验用户
-    validateUser(){
+    validateUserAndInit(){
     if(!this.config.headers.token){
       this.clearInfoAndPushToLogin();
       return ;
@@ -864,7 +866,7 @@ this.showHistory = false;
   },
     doInit(){
         this.refreshNotebookList();
-        setInterval(() => {
+        this.timerId = setInterval(() => {
           this.autoSaveNote();
         }, 10 * 1000);
         this.setIsMobile();
@@ -917,8 +919,12 @@ let w = window.innerWidth;
   }
   },
   mounted(){
-    this.validateUser();
-    // this.refreshNotebookList();
+    console.log('mounted');
+    this.validateUserAndInit();
+  },
+  beforeRouteLeave(to, from, next) {
+    clearInterval(this.timerId)
+    next()
   }
 }
 </script>
