@@ -214,13 +214,14 @@
       <el-dialog
       :modal='false'
       :show-close='false'
+      
       :center='true'
   :visible.sync="showAboutPage"
-  width="25%"
+  width="300px"
   >
   
   <strong slot="title" style="font-size:30px">📕 MarkIdea</strong>
-  <about></about>
+  <about ></about>
 </el-dialog>
 
   </div>
