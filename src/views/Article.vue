@@ -21,6 +21,7 @@
 import VditorPreview from 'vditor/dist/method.min' 
 import axios from 'axios'
 import global from '@/global'
+import util from '@/js/util'
 
 export default {
   name: 'Article',
@@ -39,6 +40,9 @@ props : {
   },
   mounted () {
     var element = document.getElementById("article");
+    if(util.isMobile()) {
+      this.showOutline = false;
+    }
     axios.get(global.HOST_URL+"/article/" + this.author + "/" + this.id).then(res => {
       res = res.data;
       if(res.code === 0 && res.data.content) {

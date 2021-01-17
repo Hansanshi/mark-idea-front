@@ -235,6 +235,7 @@
 import Editor from '@/components/Editor.vue'
 import axios from 'axios'
 import global from '@/global'
+import util from '@/js/util'
 import About from '@/components/About.vue'
 
 
@@ -874,12 +875,8 @@ this.showHistory = false;
         window.onresize = this.setIsMobile;
 },
 setIsMobile() {
-let w = window.innerWidth;
-          let that = this;
-          console.log("width: " + w)
-          if(w < 551) {
-              that.isMobile = true;
-          }
+
+              this.isMobile = util.isMobile();
 },
   isModifUnsaved(raw){
 
