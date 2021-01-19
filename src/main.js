@@ -6,7 +6,7 @@ import ElementUI from 'element-ui';
 // import 'element-ui/lib/theme-chalk/index.css';
 import '@/assets/theme/index.css'
 import contentmenu from 'v-contextmenu'
-import 'v-contextmenu/dist/index.css'
+import '@/assets/v-contextmenu/index.css'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

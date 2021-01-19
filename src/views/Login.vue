@@ -1,6 +1,6 @@
 <template>
   <div  style="margin-top: 40px; ">
-    <el-card class="box-card"  >
+    <el-card class="box-card" style="background-color: rgb(253, 253, 253)" >
         <div align="center" >
             <div style="font-size: 40px" class="markideaname">
                 &nbsp;&nbsp;&nbsp;&nbsp;<strong >MarkIdea</strong>&nbsp;&nbsp;&nbsp;&nbsp;</div></div>

@@ -1,7 +1,7 @@
 <template>
   <div >
     <el-container>
-      <el-header class="header noselect" style="background-color: #FAFAFA; " @contextmenu.prevent.native> <div >
+      <el-header class="header noselect" style="background-color: rgb(248, 248, 248); " @contextmenu.prevent.native> <div >
  <span @click="showAside = !showAside" >
 <strong>
 📕 MarkIdea</strong></span>
@@ -55,6 +55,7 @@
                 </div>
 
          <div v-for="item of notebookList" 
+         v-bind:class="{chosenNotebook:curNotebook.notebookName === item.notebookName}"
             v-contextmenu:notebookRightMenu
             :key="item.notebookName" 
             >        <div v-if="toRenameNotebookName && toRenameNotebookName.length > 0 && toRenameNotebookName === item.notebookName"  class="notebook"  >
@@ -62,14 +63,15 @@
                     v-model="destNotebookName" @keyup.enter.native="handleRenameNotebook" placeholder="新笔记本名" />
                     </div>
 
-         <div class="notebook" @click="selectNoteList(item.notebookName)" v-else>📙 {{item.notebookName}}</div>
+         <div class="notebook" @click="selectNoteList(item.notebookName)" v-else>📙  {{item.notebookName}}</div>
 
         </div> 
-        <el-collapse @contextmenu.prevent.native accordion>
-            <el-collapse-item >
+        <el-collapse @contextmenu.prevent.native accordion style="background-color: rgb(248, 248, 248);">
+            <el-collapse-item style="background-color: rgb(248, 248, 248);">
               <template  slot="title">
         <div v-contextmenu:delNotesRightMenu  class="notebook" 
-        style=" font-size: 15px; padding-bottom: 10px;color:grey;border-bottom:0px">垃圾桶</div>
+        style=" font-size: 15px; padding-bottom: 10px;color:grey;border-bottom:0px; background-color: rgb(248, 248, 248);
+">垃圾桶</div>
               </template>
               <div v-contextmenu:delNoteRightMenu class="delnote" v-for="item of delNoteList" :key="item.id">
                 
@@ -82,7 +84,8 @@
 
 
         <!-- 笔记列表  -->
-       <el-aside @contextmenu.prevent.native class="noselect noteList" width="300px" v-show="showAside && showNotes">
+       <el-aside     
+@contextmenu.prevent.native class="noselect noteList" width="300px" v-show="showAside && showNotes">
          <div  class="notebookInfo">
            <div>
            <span class="noselect">
@@ -101,6 +104,7 @@
              
          </div>
         <div class="note" 
+        v-bind:class="{chosenNote:curNote.noteTitle === item.title}"
                 v-contextmenu:noteRightMenu
 
         v-for="item of curNotebook.noteList" 
@@ -124,7 +128,7 @@
                 </div>  
 
           
-        <div>{{item.previewContent}}</div>  </div>
+        <div class="notePreview">{{item.previewContent}}</div>  </div>
         
       </el-aside>
 
@@ -139,6 +143,8 @@
          </div>
         <div class="note noselect" 
         v-for="item of searchResult" 
+                v-bind:class="{chosenNote:curNote.noteTitle === item.title && curNote.notebookName === item.notebookName}"
+
         @click="selectNote(item.title, item.notebookName)"
         :key="item.title + 'search'" >
         <!-- <i class="fa fa-file-text" style="margin-right: 5px"/> -->
@@ -148,7 +154,7 @@
         
       </el-aside>
 
-      <el-main class="editor"  style="overflow: unset">
+      <el-main v-show="!isMobile || !showAside" class="editor"  style="overflow: unset">
         <Editor  ref="editor" 
         @showHistory="handleShowHistory"
         @saveContent="handleSaveContent" @renameTitle="doHandleRenameTitle" />
@@ -441,19 +447,19 @@ export default {
     }
   },
   doSwitchNote(noteTitle, notebookName, auto){
-    console.log("doSwitchNote:" + noteTitle + ";" + notebookName);
-    console.log("auto: " + auto)
 
     let url = global.HOST_URL+"/note/"+notebookName+"/"+noteTitle;
       axios.get(url, this.config).then(res => {
         res = res.data;
         if(res.code === 0){
-          console.log(res)
           this.showHistory = false;
-          this.curNote.noteTitle = noteTitle;
-          this.curNote.content = res.data;
+          let newCurNote = {
+            noteTitle: noteTitle,
+            content: res.data,
+            notebookName: notebookName
+          }
           this.curNoteVersion = [];
-          this.curNote.notebookName = notebookName;
+          this.curNote = newCurNote;
           this.$refs.editor.setContent(noteTitle, res.data, notebookName);
           // 如果是移动端
     if(this.isMobile && !auto) {
@@ -940,7 +946,7 @@ setIsMobile() {
   padding-bottom: 15px;
   /* background-color: rgb(247, 244, 242); */
 
-  border-bottom:1px solid rgb(240, 237, 237);
+  /* border-bottom:1px solid rgb(240, 237, 237); */
 }
 .createNotebook{
   text-align: center;
@@ -969,25 +975,23 @@ setIsMobile() {
   margin-top: 5px;
   /* background-color: rgb(255, 253, 246); */
   padding:10px;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 .notebooklist{
   /* height:200px; */
-      /* background-color: rgb(252, 250, 250); */
-      border: 1px solid rgb(240, 237, 237);
+            background-color: rgb(248, 248, 248);
+
+      /* border: 1px solid rgb(240, 237, 237); */
 
 }
+.chosenNotebook{
+      background-color: rgb(252, 251, 251);
+  border-left: 3px solid rgb(199, 199, 199);
+}
 .note{
-  /* margin-top: 5px; */
-
-  margin-left: 5px;
-  margin-right: 5px;
   padding: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-    border-bottom:1px solid rgb(240, 237, 237);
 
 }
 
@@ -999,33 +1003,36 @@ setIsMobile() {
 .header{
   /* margin-top: 10px; */
   color: rgb(24, 21, 17);
-  line-height: 60px;
+  line-height: 55px;
   font-size: 25px;
-  border-top-left-radius:5px;
-    border-top-right-radius:5px;
-          border: 1px solid rgb(240, 237, 237);
+  /* border-top-left-radius:5px;
+    border-top-right-radius:5px; */
+          /* border: 1px solid rgb(240, 237, 237); */
 
 
         /* background-color: rgb(252, 250, 250); */
 
 }
 .editor{
-        border: 1px solid rgb(240, 237, 237);
+        /* border: 1px solid rgb(240, 237, 237); */
 
 }
 .noteList{
-          border: 1px solid rgb(240, 237, 237);
+          /* border: 1px solid rgb(240, 237, 237); */
+      background-color: rgb(251, 250, 250);
 
 }
 .rightMenu{
   min-width: 100px;
 }
 .delnote{
-  margin: 5px 15px 5px 15px;
-  padding: 1px 1px 1px 5px;
+  /* margin: 5px 15px 5px 15px; */
+  padding: 6px 16px 6px 20px;
   color: gray;
   font-size: 15px;
-  border-bottom:1px solid rgb(240, 237, 237);
+      background-color: rgb(251, 250, 250);
+
+  /* border-bottom:1px solid rgb(240, 237, 237); */
   /* border-top:1px solid rgb(240, 237, 237); */
 
 }
@@ -1036,4 +1043,14 @@ setIsMobile() {
   min-width: 45px;
   text-align: center;
 }
+.chosenNote{
+  background-color: white;
+  /* border-left: 3px solid rgb(199, 199, 199); */
+}
+
+.notePreview{
+  font-size: 14px;
+  color: rgb(87, 87, 87);
+}
+
 </style>
