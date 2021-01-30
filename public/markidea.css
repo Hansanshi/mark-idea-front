@@ -1,3 +1,9 @@
+body{
+    --switch-active-color: #71c094;
+    --switch-inactive-color: #CFCDCD;
+}
+
+
 /** 限制选中文字 */
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -6,7 +12,4 @@
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currentlynot supported by any browser */
-}
-.dark-backgroud{
-    
 }

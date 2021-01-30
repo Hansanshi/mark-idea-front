@@ -1,25 +1,33 @@
 <template>
   <div >
     <el-container>
-      <el-header class="header noselect" style="background-color: rgb(248, 248, 248); " @contextmenu.prevent.native> <div >
- <span @click="showAside = !showAside" >
-<strong>
-📕 MarkIdea</strong></span>
-  <!-- <span class="fa "></span> -->
+      <el-header class="header noselect" style="background-color: rgb(248, 248, 248); " @contextmenu.prevent.native> 
+        <div >
+ <span  @click="showAside = !showAside" >
+<strong >
+📕 {{pageTitle}}</strong></span>
+<span style="color: rgb(248, 248, 248); font-size: 25px; margin-top: 20px;" class="fa fa-bars"></span>
+
   <!-- <span style="padding-right: 0px; text-align: right; display: block;margin-right: 0px;">
     <el-dropdown> -->
-
-<el-dropdown class="fa  pull-right " placement="top-start"> 
+<!-- <span style="padding-right: 0px; text-align: right; margin-right: 0px;"> -->
+<el-dropdown class="pull-right" placement="top-start"> 
    <span class="el-dropdown-link">
-    <i style="color: black; font-size: 25px; margin-top: 20px" class="fa fa-bars noselect" >
+    <i style="color: black; font-size: 25px; margin-top: 20px; " class="fa fa-bars noselect" >
 </i>
 
   </span>
    <el-dropdown-menu slot="dropdown">
-           <router-link style="color: black ; text-decoration: none" to="/admin">
+           <router-link style="color: black ; text-decoration: none" to="/setting">
 
     <el-dropdown-item class="markidea-dropdown-item">
             设置
+      </el-dropdown-item>
+              </router-link>
+              <router-link style="color: black ; text-decoration: none" to="/admin">
+
+    <el-dropdown-item v-if="isAdminUser" class="markidea-dropdown-item">
+            网站管理
       </el-dropdown-item>
               </router-link>
     <el-dropdown-item class="markidea-dropdown-item" divided @click.native="showAboutPage = !showAboutPage">关于</el-dropdown-item>
@@ -28,10 +36,12 @@
   </el-dropdown-menu>  
   
   </el-dropdown>
-
+<!-- </span> -->
   <!-- </span> -->
 </div>
 </el-header>
+
+
       <el-container  >
         <!-- 笔记本列表  -->
         <el-aside width="200px" class="notebooklist noselect" v-show="showAside ">
@@ -120,6 +130,13 @@
                 class="fa fa-warning  "
                 ></i>
                                 </span>
+
+                                <!-- <el-tooltip effect="light" placement="top">
+  <div slot="content"><div style="font">修改尚未保存</div> 是否删除草稿 <el-button plain="true" size="mini">是</el-button></div>
+  <i v-if = "item.status === 2" aria-label="修改尚未保存" style = "color:lightgrey" 
+                class="fa fa-warning  "
+                ></i>
+</el-tooltip> -->
                 <span class="vditor-tooltipped vditor-tooltipped__nw" aria-label="公开笔记">
 
                 <i v-if = "item.articleId" style = "color:lightgrey;padding-left:5px" class=" fa fa-eye "></i>
@@ -254,12 +271,15 @@ export default {
   },
   data(){
     return {
+      pageTitle:this.$store.getters.getWebsiteTitle,
+
       config : {
         headers: {
           token : this.$store.getters.getToken,
           username : this.$store.getters.getUsername
         }
       },
+      isAdminUser: this.$store.getters.getUserType === 0,
       // 搜索结果title
       searchNotesName: null,
       // 是否展示搜索页面
@@ -406,7 +426,6 @@ export default {
     this.curNotebook = {};
   },
   selectNote(noteTitle, notebookName){
-    console.log("selectNote: " + noteTitle + ";" + notebookName)
     if(this.isMobile) {
       this.showAside = false;
     }
@@ -479,8 +498,6 @@ export default {
       if(res.code === 0){
         this.curNote.content = content;
         this.refreshNotebookList(notebookName);
-      }else{
-        console.log(res)
       }
 
 
@@ -497,8 +514,6 @@ export default {
         this.doSwitchNote(targetNoteTitle, targetNotebookName);
         this.refreshNotebookList();
 
-      }else{
-        console.log(res)
       }
 
     })
@@ -522,15 +537,11 @@ export default {
         content: content
     }
     let url = global.HOST_URL + "/note/" + notebookName+ "/"+ noteTitle;
-    console.log(url)
     axios.post(url, request, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
-        console.log("保存成功")
         this.curNote.content = content;
         this.refreshNotebookList();
-      }else{
-        console.log(res)
       }
 
 
@@ -542,7 +553,6 @@ export default {
     axios.get(url, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
-        console.log(res.data)
         this.curNoteVersion = res.data;
       }
     })
@@ -576,10 +586,8 @@ export default {
   // 新建笔记本
   handleCreateNotebook(){
     let url = global.HOST_URL + "/note/" + this.newNotebookName;
-    console.log(url);
     axios.put(url, {}, this.config).then(res => {
         res = res.data;
-        console.log(res);
         if(res.code === 0){
           this.newNoteBookVisible = false;
           this.refreshNotebookList(this.newNotebookName);
@@ -611,7 +619,6 @@ searchNotes(){
     return ;
   }
 
-  console.log(this.keyWord)
       let url = global.HOST_URL + "/note/search";
       if(!this.keyWord) {
         this.$notify({
@@ -633,7 +640,6 @@ searchNotes(){
           this.showSearch = true;
           this.showNotes = false;
           this.searchResult = res.data;
-            console.log(res.data);
         }
       }
     )
@@ -671,7 +677,6 @@ searchNotes(){
       }
     },
     handleDelNoteRightMenu(vnode){
-      console.log(vnode)
       this.delNoteRightMenuValues = {
         delNoteId: vnode.data.key
       }
@@ -765,7 +770,6 @@ this.showHistory = false;
       return this.noteRightMenuValues.noteTitle === this.curNote.noteTitle;
     },
     handleDelNote(){
-      console.log(this.noteRightMenuValues)
       let url = global.HOST_URL + "/note/" + this.noteRightMenuValues.notebookName + "/" + this.noteRightMenuValues.noteTitle ;
       axios.delete(url, this.config).then( res => {
       res = res.data;
@@ -889,13 +893,9 @@ setIsMobile() {
     if(this.$refs.editor.getContent(raw).charCodeAt() === 10 && this.curNote.content === ""){
         return false;
     }
-    // console.log(this.$refs.editor.getContent(raw))
-
     return this.curNote.content !== this.$refs.editor.getContent(raw);
   },
   autoSaveNote() {
-        console.log("start 临时保存")
-
     if(!this.isModifUnsaved(true)) {
       return ;
     }
@@ -914,7 +914,6 @@ setIsMobile() {
     axios.post(url, request, this.config).then(res => {
       res = res.data;
       if(res.code === 0){
-        console.log("临时保存成功")
         this.curNote.tmpContent = content;
         // this.curNote.content = content;
       }
@@ -923,7 +922,7 @@ setIsMobile() {
   }
   },
   mounted(){
-    console.log('mounted');
+    document.title = this.$store.getters.getWebsiteTitle;
     this.validateUserAndInit();
   },
   beforeRouteLeave(to, from, next) {
@@ -1002,9 +1001,12 @@ setIsMobile() {
 
 .header{
   /* margin-top: 10px; */
+  /* padding-top: 10px; */
   color: rgb(24, 21, 17);
-  line-height: 55px;
+  /* line-height: 52px; */
   font-size: 25px;
+    display:table-cell; 
+    vertical-align:bottom;
   /* border-top-left-radius:5px;
     border-top-right-radius:5px; */
           /* border: 1px solid rgb(240, 237, 237); */

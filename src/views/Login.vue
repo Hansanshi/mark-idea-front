@@ -3,7 +3,7 @@
     <el-card class="box-card" style="background-color: rgb(253, 253, 253)" >
         <div align="center" >
             <div style="font-size: 40px" class="markideaname">
-                &nbsp;&nbsp;&nbsp;&nbsp;<strong >MarkIdea</strong>&nbsp;&nbsp;&nbsp;&nbsp;</div></div>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong >{{pageTitle}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;</div></div>
         <div align="center" class="box-img">
               📕
         </div>
@@ -32,6 +32,7 @@ export default {
     name: "login",
     data() {
         return {
+pageTitle:this.$store.getters.getWebsiteTitle,
             formData: {
                 username : null,
             password : null
@@ -39,15 +40,16 @@ export default {
             formRules:{
                 username: [
                     {required:true, message:"不能为空" },
-                    {pattern:/^[A-Za-z0-9]+$/,message:'Invalid username'}
+                    {pattern:/^[A-Za-z0-9]+$/,message:'参数非法'}
                 ],
                 password: [
                     {required:true, message:"不能为空" },
-                    {pattern:/^[A-Za-z0-9!@#$^]+$/,message:'Invalid password'}
+                    {pattern:/^[A-Za-z0-9!@#$^]+$/,message:'参数非法'}
                 ]
             }
         }
     },
+    
     methods: {
         handleLogin(){
             let user = {
@@ -59,13 +61,14 @@ export default {
                 res => {
                     res = res.data;
                     if(res.code === 0){
+                        console.log(res.data)
                          this.$notify({
                             type: 'success',
                             message: '登录成功',
                             duration: 1000
                             });
-                        setTimeout(()=>{this.$router.push('/');},700);
                         this.$store.commit('setLocalInfo', res.data);
+                        setTimeout(()=>{this.$router.push('/');},700);
                     }else{
                         this.$notify({
                             type: 'warning',
@@ -82,7 +85,7 @@ export default {
                 username: this.formData.username,
                 password: this.formData.password
             };
-            let url = global.HOST_URL+"/user";
+            let url = global.HOST_URL+"/user/register";
             axios.post(url,user).then(
                 res => {
                     res = res.data;
@@ -102,6 +105,10 @@ export default {
             );
 
         }
+    },
+    mounted() {
+        
+        document.title = this.$store.getters.getWebsiteTitle + " - 登录";
     }
 }
 </script>
@@ -126,7 +133,7 @@ export default {
     font-size: 150px;
 }
 .markideaname{
-    width: 200px;
+    min-width: 200px;
     border-bottom-style: solid;
     border-width: 1px;
     border-color: lightgray;

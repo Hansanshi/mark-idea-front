@@ -1,6 +1,6 @@
 {
   "name": "mark-idea-front",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -12,7 +12,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
     "v-contextmenu": "^2.9.0",
-    "vditor": "^3.7.5",
+    "vditor": "^3.7.7",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vue-runtime-helpers": "^1.1.2",

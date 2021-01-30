@@ -4332,7 +4332,7 @@
 	background: #FFF;
 	min-width: 150px;
 	border: 1px solid #EBEEF5;
-	padding: 12px;
+	padding: 8px;
 	z-index: 2000;
 	color: #606266;
 	line-height: 1.4;
@@ -11110,7 +11110,7 @@
 	-ms-flex-align: center;
 	align-items: center;
 	height: 48px;
-	line-height: 48px;
+	/* line-height: 48px; */
 	/* background-color: #FFF; */
 	color: #303133;
 	cursor: pointer;
@@ -11145,7 +11145,7 @@
 
 .el-collapse-item__wrap {
 	will-change: height;
-	background-color: #FFF;
+	/* background-color: #FFF; */
 	overflow: hidden;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -12710,8 +12710,8 @@
 
 .el-button--primary {
 	color: #FFF;
-	background-color: #333;
-	border-color: #333
+	background-color: rgb(94, 93, 93);
+	border-color: rgb(94, 93, 93)
 }
 
 .el-button--primary:focus,.el-button--primary:hover {

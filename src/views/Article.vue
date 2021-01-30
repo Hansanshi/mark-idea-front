@@ -2,7 +2,7 @@
   <div >
         <el-container style="max-width: 1300px; margin:auto">
      <el-header  class="header noselect" @contextmenu.prevent.native >
-       <strong @click="showOutline = !showOutline"> 📕 {{author}}的笔记 - {{title}}</strong>
+       <strong @click="showOutline = !showOutline"> 📕 {{author}} - {{title}}</strong>
      </el-header>
        <el-container>
      <el-aside v-show="showOutline " class="lined" > 
@@ -17,8 +17,8 @@
   </div>
 </template>
 <script>
-
-import VditorPreview from 'vditor/dist/method.min' 
+import '@/assets/vditor.css'
+import Vditor from 'vditor'
 import axios from 'axios'
 import global from '@/global'
 import util from '@/js/util'
@@ -31,6 +31,8 @@ props : {
             },
   data() {
     return {
+            pageTitle:this.$store.getters.getWebsiteTitle,
+
       content : "# 未找到",
       title: "",
       showOutline: true
@@ -39,6 +41,7 @@ props : {
   methods: {
   },
   mounted () {
+    document.title = this.$store.getters.getWebsiteTitle;
     var element = document.getElementById("article");
     if(util.isMobile()) {
       this.showOutline = false;
@@ -47,17 +50,18 @@ props : {
       res = res.data;
       if(res.code === 0 && res.data.content) {
         this.title = res.data.noteTitle;
-        VditorPreview.preview(element, res.data.content,
+        document.title = this.$store.getters.getWebsiteTitle + " - " + this.title;
+        Vditor.preview(element, res.data.content,
         {anchor:1,
         after: () => {
-      VditorPreview.outlineRender(element, document.getElementById("outline"));
+      Vditor.outlineRender(element, document.getElementById("outline"));
 
         },
         hljs:{
                 style: "native"
             }});
       } else {
-                VditorPreview.preview(element, "# 未找到");
+                Vditor.preview(element, "# 未找到");
 
       }
     })
@@ -91,5 +95,12 @@ background-color: #FAFAFA;
   font-weight: 500;
   color: #000;
   
+}
+ul{
+  list-style: none;
+}
+svg{
+  height: 10px;
+  width: 10px;
 }
 </style>

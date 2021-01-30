@@ -16,6 +16,11 @@ Vue.use(VueRouter)
     component: () => import('../views/Login.vue')
   },
   {
+    path: '/setting',
+    name: 'setting',
+    component: () => import('../views/Setting.vue')
+  },
+  {
     path: '/admin',
     name: 'admin',
     component: () => import('../views/Admin.vue')
