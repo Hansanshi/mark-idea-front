@@ -74,7 +74,10 @@
         </el-form-item>
 
 <el-form-item v-if="editorConfig.enableCustomStyle" label="编辑器样式路径">
-                          <el-input style = "max-width:240px " clearable v-model="editorConfig.customStylePath" />
+                          <el-input style = "max-width:280px;padding-right:5px "  clearable v-model="editorConfig.customStylePath" />
+                                      <el-button type="mini"   @click="tirggerFileUpload">导入</el-button>
+  <input @change="handleFileUpload($event)" style="display : none" ref="fileUpload" type="file" />
+
                           <el-link style="padding-left: 5px" :underline="false" href="https://github.com/Hansanshi/mark-idea-front/blob/main/src/assets/vditor.css" target="_blank">样式参考</el-link>
             </el-form-item>
 
@@ -156,7 +159,31 @@ export default {
                 });
             }
         })
-    }
+    },
+      tirggerFileUpload(){
+          this.$refs.fileUpload.click();
+      },
+    handleFileUpload(){
+        let file = event.target.files[0];
+        let param = new FormData();
+        param.append('file', file);
+        let config = {
+            headers: { 
+              'Content-Type': 'multipart/form-data',
+                token : this.config.headers.token,
+                username : this.config.headers.username
+            }
+        };  
+        //添加请求头
+        let url = global.HOST_URL + "/file";
+        axios.post(url, param, config).then(res => {
+          res = res.data;
+          if(res.code !== 0){
+            return ;
+          }
+          this.editorConfig.customStylePath = res.data;
+        });
+      }
   }
 
 }
