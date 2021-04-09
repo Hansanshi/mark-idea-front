@@ -46,7 +46,7 @@
         <!-- 笔记本列表  -->
         <el-aside width="200px" class="notebooklist noselect" v-show="showAside ">
           <div style="margin:5px">
-          <el-input clearable v-model="keyWord" @keyup.enter.native="searchNotes" placeholder="搜索笔记"></el-input>
+          <el-input clearable v-model="keyWord" @blur="keyWord = null" @keyup.enter.native="searchNotes" placeholder="搜索笔记"></el-input>
           </div>
         <div @contextmenu.prevent class="notebook" style="  padding-bottom: 10px;color:grey">
         <span  style="font-size: 15px">
@@ -69,7 +69,7 @@
             v-contextmenu:notebookRightMenu
             :key="item.notebookName" 
             >        <div v-if="toRenameNotebookName && toRenameNotebookName.length > 0 && toRenameNotebookName === item.notebookName"  class="notebook"  >
-                    <el-input 
+                    <el-input @blur="toRenameNotebookName = null"
                     v-model="destNotebookName" @keyup.enter.native="handleRenameNotebook" placeholder="新笔记本名" />
                     </div>
 
@@ -336,7 +336,7 @@ export default {
   methods: {
     
   refreshNotebookList(notebookName){
-    this.clearRenameInfo();
+    // this.clearRenameInfo();
     axios.get(global.HOST_URL+"/note", this.config).then(res => {
       res = res.data;
       if(res.code === 0){
@@ -395,7 +395,6 @@ export default {
   },
   // 真的切换笔记本
   doSwitchNotebook(notebookName){
-    this.clearRenameInfo();
     for (const notebook of this.notebookList) {
           if(notebook.notebookName === notebookName){
             this.curNotebook = notebook;

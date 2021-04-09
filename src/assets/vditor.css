@@ -36,12 +36,12 @@
 	--panel-background-color: #fff;
 	--panel-shadow: 0 1px 2px rgba(0,0,0,0.2);
 	--toolbar-background-color: #ffffff;
-	--toolbar-icon-color: #586069;
-	--toolbar-icon-hover-color: #000000;
+	--toolbar-icon-color: #242525;
+	--toolbar-icon-hover-color: #0E141A;
 	--toolbar-height: 35px;
 	--toolbar-divider-margin-top: 8px;
 	--textarea-background-color: #ffffff;
-	--textarea-text-color: #24292e;
+	--textarea-text-color: #000000;
 	--resize-icon-color: var(--toolbar-icon-color);
 	--resize-background-color: var(--toolbar-background-color);
 	--resize-hover-icon-color: var(--panel-background-color);
@@ -49,12 +49,14 @@
 	--count-background-color: rgba(27,31,35,0.05);
 	--heading-border-color: #eaecef;
 	--blockquote-color: #6a737d;
-	--ir-heading-color: #660e7a;
+	--ir-heading-color: #afb5bd;
 	--ir-title-color: grey;
-	--ir-bi-color: #0033b3;
-	--ir-link-color: green;
-	--ir-bracket-color: #00f;
-	--ir-paren-color: green
+	--ir-bi-color: #b3b2b2;
+	--ir-link-color:#5E828F;
+	--ir-link-title-color:#42B983;
+	/* --ir-link-title-color:#42B983; */
+	--ir-bracket-color: #D0CECE;
+	--ir-paren-color: #D0CECE
 }
 
 .vditor--dark {
@@ -908,7 +910,7 @@
 }
 
 .vditor-reset {
-	color: #24292e;
+	color: var(--textarea-text-color);
 	font-variant-ligatures: no-common-ligatures;
 	font-family: Helvetica Neue,Luxi Sans,DejaVu Sans,Hiragino Sans GB,Microsoft Yahei,sans-serif,Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Android Emoji,EmojiSymbols;
 	word-wrap: break-word;
@@ -1087,7 +1089,8 @@
 	font-family: mononoki,Consolas,Liberation Mono,Menlo,Courier,monospace,Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Android Emoji,EmojiSymbols;
 	word-break: break-word;
 	background-size: 20px 20px;
-	white-space: pre-wrap
+	white-space: pre-wrap;
+	background-color: white;
 }
 
 .vditor-reset pre {
@@ -1737,7 +1740,7 @@
 }
 
 .vditor-ir__link {
-	color: var(--ir-bracket-color);
+	color: var(--ir-link-title-color);
 	text-decoration: underline
 }
 

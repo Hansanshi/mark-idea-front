@@ -1,5 +1,5 @@
 <template>
-  <div> 编辑器设置 
+  <div> 
 
       <el-form ref="form" label-width="140px">
 
@@ -50,6 +50,16 @@
     :inactive-value="false">
   </el-switch>
         </el-form-item>
+
+  <el-form-item label="是否默认开启大纲">
+            <el-switch
+    v-model="editorConfig.enableOutline"
+    :active-color="switchActiveColor"
+    :inactive-color="switchInactiveColor"
+    :active-value="true"
+    :inactive-value="false">
+  </el-switch>
+</el-form-item>
 
 
 <el-form-item label="大纲位置">
