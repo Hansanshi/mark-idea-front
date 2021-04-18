@@ -210,7 +210,6 @@ export default {
           document.querySelector('.vditor-outline').classList.add("vditor-toolbar--pin")
         },
         input: () => {
-          console.log()
           this.contentModfied = (this.vditor.getValue() !== this.originContent);
         },
           mode: this.editorConfig.editMode,
@@ -320,7 +319,7 @@ export default {
       this.$emit('showHistory');
     },
     renameTitle(){
-      this.$emit('renameTitle', this.title);
+      this.$emit('renameTitle', this.newTitle);
     },
     handleClose(done) {
         this.$confirm('确认关闭？')
