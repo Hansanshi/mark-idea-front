@@ -177,14 +177,24 @@
         @saveContent="handleSaveContent" @renameTitle="doHandleRenameTitle" />
       </el-main>
     
-<el-aside width="180px" v-if="showHistory">
+<el-aside width="220px" v-if="showHistory">
+
+<el-dialog
+  :visible.sync="showHistoryPreview"
+  width="60%"
+  @opened="handleOpenHistoryPrev"
+  >
+  <history-preview ref="historyPreview"></history-preview>
+</el-dialog>
+
   <div style="padding-left: 10px;padding-top: 15px;">
   <div style="font-size:18px;padding-bottom: 5px; border"><span style="font-size:20px">🎛️ </span><strong>历史版本</strong></div>
                <div v-for="version of curNoteVersion" :key="version.ref" >
-                <span style="font-size:13px;margin-right:3px">{{version.date}}</span>
-                    <el-button size="mini" type="text" style="font-size:13px"
+                <span style="font-size:13px;margin-right:5px">{{version.date}}</span>
+                    <el-button v-show="version.ref !== curRef" size="mini" type="text" style="font-size:13px"
                     @click="handleRecover(version.ref)"
                       >恢复</el-button>
+                      <el-button v-show="version.ref !== curRef" size="mini" type="text"  style="font-size:13px;" @click="handlePreviewHistory(version.ref)">预览</el-button>
               </div>
   </div>
 </el-aside>
@@ -256,6 +266,7 @@
 
 <script>
 import Editor from '@/components/Editor.vue'
+import HistoryPreview from '@/components/HistoryPreview.vue'
 import axios from 'axios'
 import global from '@/global'
 import util from '@/js/util'
@@ -267,7 +278,8 @@ export default {
   components: {
     // HelloWorld,
     Editor,
-    About
+    About,
+    HistoryPreview
   },
   data(){
     return {
@@ -323,7 +335,9 @@ export default {
         noteTitle: null,
         content: ""      },
       curNoteVersion: [],
+      curRef: null,
       showAside: true,
+      showHistoryPreview: false, //是否展示历史预览
       // 是否展示笔记列表
       showNotes: true,
       notebookList: [],
@@ -477,6 +491,7 @@ export default {
             notebookName: notebookName
           }
           this.curNoteVersion = [];
+          this.curRef = null
           this.curNote = newCurNote;
           this.$refs.editor.setContent(noteTitle, res.data, notebookName);
           // 如果是移动端
@@ -553,6 +568,7 @@ export default {
       res = res.data;
       if(res.code === 0){
         this.curNoteVersion = res.data;
+        this.curRef = res.data[0].ref
       }
     })
   },
@@ -875,7 +891,35 @@ this.showHistory = false;
       }
     })
   },
-    doInit(){
+
+// 查询历史记录
+handlePreviewHistory (ref) {
+  this.showHistoryPreview = true
+  this.previewRef = ref
+},
+handleOpenHistoryPrev() {
+  this.$refs.historyPreview.setText("fdshiufhsiusdh745897384957489357")
+  let url = global.HOST_URL + "/history/queryHistoryContent"
+  let req = {
+    notebookName: this.curNotebook.notebookName,
+    noteTitle: this.curNote.noteTitle,
+    versionRef: this.previewRef
+  }
+  axios.post(url, req, this.config).then(res => {
+    res = res.data;
+    if(res.code !== 0) {
+      this.$notify({
+              type: 'error',
+              message: "获取历史版本内容失败",
+              duration: 1000
+          });
+          return 
+    }
+    this.$refs.historyPreview.setText(res.data)
+  })
+},
+
+  doInit(){
         this.refreshNotebookList();
         this.timerId = setInterval(() => {
           this.autoSaveNote();
