@@ -4,8 +4,9 @@
       <el-header class="header noselect" style="background-color: rgb(248, 248, 248); " @contextmenu.prevent.native> 
         <div >
  <span  @click="showAside = !showAside" >
+ <span>📕</span>
 <strong >
-📕 {{pageTitle}}</strong></span>
+ {{pageTitle}}</strong></span>
 <span style="color: rgb(248, 248, 248); font-size: 25px; margin-top: 20px;" class="fa fa-bars"></span>
 
   <!-- <span style="padding-right: 0px; text-align: right; display: block;margin-right: 0px;">
@@ -978,7 +979,6 @@ setIsMobile() {
 .notebook{
   /* margin: 15px; */
   color: rgb(41, 38, 38);
-  font-weight: bold;
   font-size: 18px;
   margin-top: 1px;
   margin-left: 10px;
@@ -1018,7 +1018,7 @@ setIsMobile() {
   /* background-color: rgb(255, 253, 246); */
   padding:10px;
   font-size: 26px;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .notebooklist{
@@ -1038,7 +1038,7 @@ setIsMobile() {
 }
 
 .notetitle{
-  font-weight: bold;
+  /* font-weight: bold; */
   margin-bottom: 5px;
 }
 

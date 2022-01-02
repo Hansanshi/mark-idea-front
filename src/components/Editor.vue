@@ -334,7 +334,7 @@ export default {
 <style>
 .title{
   font-size: 24px;
-  font-weight: bold;
+  /* font-weight: bold; */
   margin-bottom: 5px;
 }
 .vidtor{
